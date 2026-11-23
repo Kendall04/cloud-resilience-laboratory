@@ -1,0 +1,84 @@
+name: CI - Terragrunt Static
+
+on:
+  workflow_call:
+    inputs:
+      run_acceptance:
+        description: "Run E1 acceptance for standalone callers; orchestrator runs it once separately."
+        required: false
+        type: boolean
+        default: true
+      target_env:
+        description: "Environment label used for static validation context."
+        required: false
+        type: string
+        default: dev
+      aws_region:
+        description: "AWS region"
+        required: false
+        type: string
+        default: us-east-1
+
+permissions:
+  contents: read
+
+jobs:
+  static-checks:
+    name: Terragrunt Static Checks
+    runs-on: ubuntu-latest
+    env:
+      TG_ENV: ${{ inputs.target_env }}
+      AWS_REGION: ${{ inputs.aws_region }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+
+      - name: Validate inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          case "$TG_ENV" in
+            dev|prod) ;;
+            *)
+              echo "::error::target_env must be dev or prod."
+              exit 1
+              ;;
+          esac
+
+      - name: Install verified infrastructure tools
+        run: python3 -I -B .github/scripts/ci/install-tools.py terraform terragrunt tflint tfsec
+
+      - name: Final E1 repository acceptance
+        if: inputs.run_acceptance
+        shell: bash
+        run: |
+          python3 -I -B scripts/tests/final_acceptance/gate.py --report-dir "$RUNNER_TEMP/e1-acceptance"
+
+      - name: Run TFLint
+        run: |
+          set -euo pipefail
+          tflint --version
+          python3 -I -B .github/scripts/ci/check-static-findings.py tflint
+
+      - name: Run tfsec
+        run: python3 -I -B .github/scripts/ci/check-static-findings.py tfsec
+
+      - name: Terraform fmt
+        run: terraform fmt -check -recursive terraform/
+
+      - name: Terragrunt HCL fmt
+        run: terragrunt hcl format --check --working-dir terraform/live
+
+      - name: Static summary
+        run: |
+          {
+            echo "## Terragrunt static checks"
+            echo
+            echo "Target environment label: ${TG_ENV}"
+            echo
+            echo "Static CI stops here: no AWS OIDC, no remote backend init, and no plan."
+          } >> "$GITHUB_STEP_SUMMARY"

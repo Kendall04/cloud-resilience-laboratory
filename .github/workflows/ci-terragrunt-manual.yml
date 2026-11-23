@@ -1,0 +1,39 @@
+{
+  "name": "Manual Read Only Plan",
+  "on": {
+    "workflow_dispatch": {
+      "inputs": {
+        "environment": {
+          "type": "string",
+          "required": true,
+          "description": "dev or prod; selects disjoint fixed entry jobs."
+        },
+        "request": {
+          "type": "string",
+          "required": true,
+          "description": "Closed operation JSON; never AWS resource or credential inputs."
+        }
+      }
+    }
+  },
+  "permissions": {
+    "contents": "read"
+  },
+  "concurrency": {
+    "group": "e1-Manual-Read-Only-Plan-${{ github.ref }}",
+    "cancel-in-progress": false
+  },
+  "jobs": {
+    "plan": {
+      "uses": "./.github/workflows/ci-terragrunt-plan.yml",
+      "permissions": {
+        "contents": "read",
+        "id-token": "write"
+      },
+      "with": {
+        "environment": "${{ inputs.environment }}",
+        "request": "${{ inputs.request }}"
+      }
+    }
+  }
+}

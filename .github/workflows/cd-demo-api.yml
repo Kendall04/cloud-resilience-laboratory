@@ -1,0 +1,58 @@
+{
+  "name": "Application CD",
+  "on": {
+    "workflow_dispatch": {
+      "inputs": {}
+    },
+    "workflow_call": {
+      "inputs": {}
+    }
+  },
+  "permissions": {
+    "contents": "read"
+  },
+  "concurrency": {
+    "group": "e1-Application-CD-${{ github.ref }}",
+    "cancel-in-progress": false
+  },
+  "jobs": {
+    "infra-ready": {
+      "runs-on": "ubuntu-latest",
+      "permissions": {},
+      "steps": [
+        {
+          "run": "echo \"::error::E1 plan-dev is inactive: no verified immutable workflow pin, installation and governance binding.\"; exit 1"
+        }
+      ],
+      "if": "${{ github.ref == 'refs/heads/develop' }}"
+    },
+    "release": {
+      "runs-on": "ubuntu-latest",
+      "permissions": {},
+      "steps": [
+        {
+          "run": "echo \"::error::E1 release is inactive: no verified immutable workflow pin, installation and governance binding.\"; exit 1"
+        }
+      ],
+      "needs": [
+        "infra-ready"
+      ]
+    },
+    "deploy": {
+      "runs-on": "ubuntu-latest",
+      "permissions": {},
+      "steps": [
+        {
+          "run": "echo \"::error::E1 deploy-dev is inactive: no verified immutable workflow pin, installation and governance binding.\"; exit 1"
+        }
+      ],
+      "needs": [
+        "release"
+      ],
+      "concurrency": {
+        "group": "e1-application-delivery-dev",
+        "cancel-in-progress": false
+      }
+    }
+  }
+}

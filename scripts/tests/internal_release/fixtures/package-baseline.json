@@ -1,0 +1,21 @@
+{
+  "source_revision": "fcd492da928e2bb9b2fc715a39f1733a7289e13d",
+  "source_path": "terraform/infra/security/authority.json",
+  "source_sha256": "ce633e09cdd757d03c47d7ed531cf7c7fb932460ae32268add3385b9fd323605",
+  "selector": [
+    "control_bundles",
+    "classes",
+    "sha256 by class"
+  ],
+  "value": {
+    "request-gateway": "0916cf7b9f04ff153c3cee8f82a0d299108c70aa9ca2d0e93a9437b5ef651ce4",
+    "build": "ef9ce1edd5331ea6dccebfa4ea9783c40650fd6b075e87c2ce0f3c6553701ec4",
+    "qualification-finalizer": "0e34a5cd928e91694083a46aba1291b1526b7c1c47faaed4fe51a4ea60eb8fae",
+    "status": "10bb83de76c8eefa49c1a96e04f25b3b86bffda3573a9b3b03380b406cb20e8b",
+    "environment-lifecycle": "ec6506979a772686a41fcdfb02cfaa7255c1e459517ccf3a3d45117dda553f14",
+    "normal-delivery": "b4b70fe16d42d090ca5da575a8da6527475d5a597f45c7005f3b882331d7c298",
+    "emergency-recovery": "95af1e11b9a78ba1e7f96c74df25fb386a95664a7fcfd252745365bb5c148d97",
+    "cleanup-recovery": "16af2a5223599a22de134e7a73659a85aec54297d76ae22e39e80d4405f3e726",
+    "nat-recovery": "f6441b2b13b86a6512f7df875fb9e5025a66196ffb93265b78d5c13950e2301b"
+  }
+}

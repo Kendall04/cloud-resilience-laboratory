@@ -1,0 +1,78 @@
+{
+  "name": "Rollback Manifest",
+  "on": {
+    "workflow_dispatch": {
+      "inputs": {
+        "environment": {
+          "type": "string",
+          "required": true,
+          "description": "dev or prod; selects disjoint fixed entry jobs."
+        },
+        "history": {
+          "type": "string",
+          "required": true
+        },
+        "replicas": {
+          "type": "number",
+          "default": 1,
+          "required": false
+        }
+      }
+    },
+    "workflow_call": {
+      "inputs": {
+        "environment": {
+          "type": "string",
+          "required": true,
+          "description": "dev or prod; selects disjoint fixed entry jobs."
+        },
+        "history": {
+          "type": "string",
+          "required": true
+        },
+        "replicas": {
+          "type": "number",
+          "default": 1,
+          "required": false
+        }
+      }
+    }
+  },
+  "permissions": {
+    "contents": "read"
+  },
+  "concurrency": {
+    "group": "e1-Rollback-Manifest-${{ github.ref }}",
+    "cancel-in-progress": false
+  },
+  "jobs": {
+    "dev": {
+      "runs-on": "ubuntu-latest",
+      "permissions": {},
+      "steps": [
+        {
+          "run": "echo \"::error::E1 deploy-dev is inactive: no verified immutable workflow pin, installation and governance binding.\"; exit 1"
+        }
+      ],
+      "if": "${{ inputs.environment == 'dev' && github.ref == 'refs/heads/codex/final-github-actions-cicd' && github.event_name == 'workflow_dispatch' }}",
+      "concurrency": {
+        "group": "e1-application-delivery-dev",
+        "cancel-in-progress": false
+      }
+    },
+    "prod": {
+      "runs-on": "ubuntu-latest",
+      "permissions": {},
+      "steps": [
+        {
+          "run": "echo \"::error::E1 promote-prod is inactive: no verified immutable workflow pin, installation and governance binding.\"; exit 1"
+        }
+      ],
+      "if": "${{ inputs.environment == 'prod' && github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch' }}",
+      "concurrency": {
+        "group": "e1-application-delivery-prod",
+        "cancel-in-progress": false
+      }
+    }
+  }
+}

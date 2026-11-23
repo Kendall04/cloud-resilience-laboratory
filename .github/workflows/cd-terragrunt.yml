@@ -1,0 +1,82 @@
+{
+  "name": "Protected Environment Lifecycle",
+  "on": {
+    "workflow_dispatch": {
+      "inputs": {
+        "environment": {
+          "type": "string",
+          "required": true,
+          "description": "dev or prod; selects disjoint fixed entry jobs."
+        },
+        "request": {
+          "type": "string",
+          "required": true,
+          "description": "Closed operation JSON; never AWS resource or credential inputs."
+        }
+      }
+    },
+    "workflow_call": {
+      "inputs": {
+        "environment": {
+          "type": "string",
+          "required": true,
+          "description": "dev or prod; selects disjoint fixed entry jobs."
+        },
+        "request": {
+          "type": "string",
+          "required": true,
+          "description": "Closed operation JSON; never AWS resource or credential inputs."
+        }
+      }
+    }
+  },
+  "permissions": {
+    "contents": "read"
+  },
+  "concurrency": {
+    "group": "e1-Protected-Environment-Lifecycle-${{ github.ref }}",
+    "cancel-in-progress": false
+  },
+  "jobs": {
+    "infra-dev": {
+      "runs-on": "ubuntu-latest",
+      "permissions": {},
+      "steps": [
+        {
+          "run": "echo \"::error::E1 infra-dev is inactive: no verified immutable workflow pin, installation and governance binding.\"; exit 1"
+        }
+      ],
+      "if": "${{ inputs.environment == 'dev' && github.ref == 'refs/heads/develop' && (!contains(fromJSON('[\"data\",\"apps\"]'),fromJSON(inputs.request).layer) && fromJSON(inputs.request).operation != 'teardown') }}"
+    },
+    "infra-prod": {
+      "runs-on": "ubuntu-latest",
+      "permissions": {},
+      "steps": [
+        {
+          "run": "echo \"::error::E1 infra-prod is inactive: no verified immutable workflow pin, installation and governance binding.\"; exit 1"
+        }
+      ],
+      "if": "${{ inputs.environment == 'prod' && github.ref == 'refs/heads/main' && (!contains(fromJSON('[\"data\",\"apps\"]'),fromJSON(inputs.request).layer) && fromJSON(inputs.request).operation != 'teardown') }}"
+    },
+    "infra-high-risk-dev": {
+      "runs-on": "ubuntu-latest",
+      "permissions": {},
+      "steps": [
+        {
+          "run": "echo \"::error::E1 infra-high-risk-dev is inactive: no verified immutable workflow pin, installation and governance binding.\"; exit 1"
+        }
+      ],
+      "if": "${{ inputs.environment == 'dev' && github.ref == 'refs/heads/develop' && (contains(fromJSON('[\"data\",\"apps\"]'),fromJSON(inputs.request).layer) || fromJSON(inputs.request).operation == 'teardown') }}"
+    },
+    "infra-high-risk-prod": {
+      "runs-on": "ubuntu-latest",
+      "permissions": {},
+      "steps": [
+        {
+          "run": "echo \"::error::E1 infra-high-risk-prod is inactive: no verified immutable workflow pin, installation and governance binding.\"; exit 1"
+        }
+      ],
+      "if": "${{ inputs.environment == 'prod' && github.ref == 'refs/heads/main' && (contains(fromJSON('[\"data\",\"apps\"]'),fromJSON(inputs.request).layer) || fromJSON(inputs.request).operation == 'teardown') }}"
+    }
+  }
+}

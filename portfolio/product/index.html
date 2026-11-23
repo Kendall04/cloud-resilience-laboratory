@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0b111b" />
+    <meta name="description" content="Explore the Cloud Resilience Laboratory text demo and the ECS architecture that supports it." />
+    <title>Cloud Resilience Laboratory</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='none' stroke='%23bcf276' stroke-width='3' d='M4 8h17l7 8-7 8H4V8Zm8 0v16m8-16v16'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="/assets/style.css" />
+    <script type="module" src="/assets/app.mjs"></script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="space-header">
+      <a class="space-brand" href="/demo" data-route>Cloud Resilience Laboratory</a>
+      <nav id="space-nav" aria-label="Lab workspaces">
+        <a href="/demo" data-route>Text Demo</a>
+        <a href="/architecture" data-route>Architecture Explorer</a>
+      </nav>
+      <span class="space-caption">AWS · ECS Fargate</span>
+    </header>
+    <div class="shell">
+      <aside class="sidebar" id="workspace-sidebar"></aside>
+      <div class="content">
+        <div class="context-bar" id="workspace-context"></div>
+        <main id="main" tabindex="-1"></main>
+        <footer>
+          <span>Cloud Resilience Laboratory</span>
+          <span id="footer-mode"></span>
+          <a href="https://github.com/Kendall04/cloud-resilience-laboratory/tree/main" target="_blank" rel="noopener noreferrer">Repository</a>
+        </footer>
+      </div>
+    </div>
+    <div id="announcer" class="sr-only" role="status" aria-live="polite"></div>
+  </body>
+</html>

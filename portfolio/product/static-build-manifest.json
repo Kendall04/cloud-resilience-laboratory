@@ -1,0 +1,134 @@
+{
+  "schema": "ECS_PORTFOLIO_STATIC_V1",
+  "edition": "demo",
+  "files": [
+    {
+      "path": "architecture/index.html",
+      "bytes": 2047,
+      "sha256": "baa71bc27dd062365f533c3c8b84666c4044b2efb8be1f4b62bce09eb5faa492"
+    },
+    {
+      "path": "assets/api.mjs",
+      "bytes": 4249,
+      "sha256": "0cbe0eb0520af40b7a593472b172349e8a88ce84469cb5da07fd320edc06ed28"
+    },
+    {
+      "path": "assets/app.mjs",
+      "bytes": 21289,
+      "sha256": "d6eb42063858a35a77d044b9c5afa8f49b9f251384ef4297599c88a416d37b49"
+    },
+    {
+      "path": "assets/atlas.mjs",
+      "bytes": 21100,
+      "sha256": "7b1952f83fc55bd64342704cd0ad7a40ee540e89489d8eed44f2a4e126ab7442"
+    },
+    {
+      "path": "assets/config.mjs",
+      "bytes": 28,
+      "sha256": "ca0cdc33e4b6c6f950b71ab16db2dbab6adfd3d1f37546ffe40d2cc14edbe6f5"
+    },
+    {
+      "path": "assets/site-routes.mjs",
+      "bytes": 770,
+      "sha256": "d30d6e3402d6ca9ff95a0fb2c1cf63a93ac48db5507ae956fd30d888482573e9"
+    },
+    {
+      "path": "assets/style.css",
+      "bytes": 12734,
+      "sha256": "eaa106cb85ea13e867e821e42b74cc37fb014b547901620f40bc26ec3bf49ba6"
+    },
+    {
+      "path": "demo/index.html",
+      "bytes": 2047,
+      "sha256": "baa71bc27dd062365f533c3c8b84666c4044b2efb8be1f4b62bce09eb5faa492"
+    },
+    {
+      "path": "diagrams/ecs-delivery.html",
+      "bytes": 826097,
+      "sha256": "aa58e757dc049b5e0a4c840bfe3d7329c0eaff46c5f4892776248a3c4e7f831c"
+    },
+    {
+      "path": "diagrams/ecs-network.html",
+      "bytes": 830084,
+      "sha256": "d8b0d3c8f5f6d6f6d59af9cd7818efda3474e612b4b4d19eb789365febab535f"
+    },
+    {
+      "path": "diagrams/ecs-platform.html",
+      "bytes": 831884,
+      "sha256": "5998a6172e57ce0320e17ea8cc7494741bcfa758f659ae569c21e0d5d8f02002"
+    },
+    {
+      "path": "diagrams/ecs-sql-recovery.html",
+      "bytes": 830595,
+      "sha256": "7bd5908f697fac7e00819642844d0d539861a7d8290ef2da261845ed7a49679c"
+    },
+    {
+      "path": "diagrams/ecs-trust.html",
+      "bytes": 834864,
+      "sha256": "94b2c507944cace6f78869a13f5e504325b8c636301fa0504157f7fd6f5e0a7e"
+    },
+    {
+      "path": "HOSTING.json",
+      "bytes": 968,
+      "sha256": "a8b6e68edcaa3ec48af1fe49a8fb0739015b03187a8ab4bcf6b621f6b9721ec9"
+    },
+    {
+      "path": "index.html",
+      "bytes": 2047,
+      "sha256": "baa71bc27dd062365f533c3c8b84666c4044b2efb8be1f4b62bce09eb5faa492"
+    },
+    {
+      "path": "reading/ecs-delivery.html",
+      "bytes": 236665,
+      "sha256": "9cd69788a81e3485343d2686ecb813bb32c2f470c0019d438595ea1f13203fd5"
+    },
+    {
+      "path": "reading/ecs-network.html",
+      "bytes": 241529,
+      "sha256": "90ad0c9899f1a53d4cb967d9ef0d8cda68da4244a7095bc19e3e88d435f7314d"
+    },
+    {
+      "path": "reading/ecs-platform.html",
+      "bytes": 243390,
+      "sha256": "3fbe7ebbe883f7edbc24c7a969ca693d01d0deac4dbeaca778e97a1b6128fc45"
+    },
+    {
+      "path": "reading/ecs-sql-recovery.html",
+      "bytes": 242164,
+      "sha256": "709450d3fbbd33de47936d9a67c52fb0b58c4f78204224c5bec476922e0b505d"
+    },
+    {
+      "path": "reading/ecs-trust.html",
+      "bytes": 246650,
+      "sha256": "d42e234678eff9f69690a485b05a025180746028e8c351384eaeb131541c3d7e"
+    },
+    {
+      "path": "sources/ecs-delivery.json",
+      "bytes": 6348,
+      "sha256": "ab13264262b753bc36a06a8702e5bc2b70dfbaf575a90360376c66c632c84eb7"
+    },
+    {
+      "path": "sources/ecs-network.json",
+      "bytes": 7756,
+      "sha256": "09eca01392aa04366195faf09196b930d373bb3c905fd6a2c916c10023a3dbba"
+    },
+    {
+      "path": "sources/ecs-platform.json",
+      "bytes": 7606,
+      "sha256": "28ad5723127fb241d7e7bb77a2062668c74ed1b876a4a44ab426e7ac09e56832"
+    },
+    {
+      "path": "sources/ecs-sql-recovery.json",
+      "bytes": 7407,
+      "sha256": "aeb05a72562b5ae53fc63a958bc9b87bc7cf7719168af180838d5aff2b437fec"
+    },
+    {
+      "path": "sources/ecs-trust.json",
+      "bytes": 8736,
+      "sha256": "cdc3667666c77599ee8ed11999ee5b2ac3addc2a601863e41aa0bc829df687a0"
+    }
+  ],
+  "contentSHA256": "49f416ec8b373bc002f8f195c14684395b66dc9b902fe1e891d306ce089776a4",
+  "awsCredentials": false,
+  "awsProxy": false
+}

@@ -1,0 +1,52 @@
+{
+  "name": "Emergency Recovery",
+  "on": {
+    "workflow_dispatch": {
+      "inputs": {
+        "environment": {
+          "type": "string",
+          "required": true,
+          "description": "dev or prod; selects disjoint fixed entry jobs."
+        }
+      }
+    },
+    "workflow_call": {
+      "inputs": {
+        "environment": {
+          "type": "string",
+          "required": true,
+          "description": "dev or prod; selects disjoint fixed entry jobs."
+        }
+      }
+    }
+  },
+  "permissions": {
+    "contents": "read"
+  },
+  "concurrency": {
+    "group": "e1-Emergency-Recovery-${{ github.ref }}",
+    "cancel-in-progress": false
+  },
+  "jobs": {
+    "dev": {
+      "runs-on": "ubuntu-latest",
+      "permissions": {},
+      "steps": [
+        {
+          "run": "echo \"::error::E1 emergency-dev is inactive: no verified immutable workflow pin, installation and governance binding.\"; exit 1"
+        }
+      ],
+      "if": "${{ inputs.environment == 'dev' && github.ref == 'refs/heads/develop' && github.event_name == 'workflow_dispatch' }}"
+    },
+    "prod": {
+      "runs-on": "ubuntu-latest",
+      "permissions": {},
+      "steps": [
+        {
+          "run": "echo \"::error::E1 emergency-prod is inactive: no verified immutable workflow pin, installation and governance binding.\"; exit 1"
+        }
+      ],
+      "if": "${{ inputs.environment == 'prod' && github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch' }}"
+    }
+  }
+}

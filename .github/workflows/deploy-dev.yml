@@ -1,0 +1,54 @@
+{
+  "name": "Deploy Dev",
+  "on": {
+    "workflow_dispatch": {
+      "inputs": {
+        "release_id": {
+          "type": "string",
+          "required": true
+        },
+        "replicas": {
+          "type": "number",
+          "default": 1,
+          "required": false
+        }
+      }
+    },
+    "workflow_call": {
+      "inputs": {
+        "release_id": {
+          "type": "string",
+          "required": true
+        },
+        "replicas": {
+          "type": "number",
+          "default": 1,
+          "required": false
+        }
+      }
+    }
+  },
+  "permissions": {
+    "contents": "read"
+  },
+  "concurrency": {
+    "group": "e1-Deploy-Dev-${{ github.ref }}",
+    "cancel-in-progress": false
+  },
+  "jobs": {
+    "deploy": {
+      "runs-on": "ubuntu-latest",
+      "permissions": {},
+      "steps": [
+        {
+          "run": "echo \"::error::E1 deploy-dev is inactive: no verified immutable workflow pin, installation and governance binding.\"; exit 1"
+        }
+      ],
+      "if": "${{ github.ref == 'refs/heads/codex/final-github-actions-cicd' }}",
+      "concurrency": {
+        "group": "e1-application-delivery-dev",
+        "cancel-in-progress": false
+      }
+    }
+  }
+}

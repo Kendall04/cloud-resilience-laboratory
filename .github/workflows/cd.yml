@@ -1,0 +1,407 @@
+{
+  "name": "CD Orchestrator",
+  "on": {
+    "push": {
+      "branches": [
+        "develop",
+        "main"
+      ],
+      "paths": [
+        "terraform/**",
+        "demo-api/**",
+        "scripts/**",
+        ".github/**",
+        "ci/**"
+      ]
+    }
+  },
+  "permissions": {
+    "contents": "read"
+  },
+  "concurrency": {
+    "group": "e1-CD-Orchestrator-${{ github.ref }}",
+    "cancel-in-progress": false
+  },
+  "jobs": {
+    "scope": {
+      "uses": "./.github/workflows/cd-scope.yml",
+      "permissions": {
+        "contents": "read",
+        "pull-requests": "read"
+      }
+    },
+    "prepare-dev": {
+      "needs": [
+        "scope"
+      ],
+      "if": "${{ github.ref == 'refs/heads/develop' && needs.scope.outputs.critical_manual_only_changed != 'true' && needs.scope.outputs.unmapped_high_risk_paths == '' }}",
+      "runs-on": "ubuntu-latest",
+      "permissions": {},
+      "outputs": {
+        "shared": "${{ steps.requests.outputs.shared }}",
+        "secrets": "${{ steps.requests.outputs.secrets }}",
+        "global": "${{ steps.requests.outputs.global }}",
+        "data": "${{ steps.requests.outputs.data }}",
+        "platform": "${{ steps.requests.outputs.platform }}",
+        "apps": "${{ steps.requests.outputs.apps }}",
+        "edge": "${{ steps.requests.outputs.edge }}"
+      },
+      "steps": [
+        {
+          "id": "requests",
+          "shell": "bash",
+          "env": {
+            "SAFE": "${{ needs.scope.outputs.safe_layers }}",
+            "HIGH": "${{ needs.scope.outputs.high_risk_layers }}",
+            "REVISION": "${{ vars.E1_INFRA_DEV_REVISION }}",
+            "HIGH_REVISION": "${{ vars.E1_INFRA_HIGH_RISK_DEV_REVISION }}"
+          },
+          "run": "python3 -I -B - <<'PY'\nimport json,os,uuid\nsafe=os.environ['SAFE'].splitlines();high=os.environ['HIGH'].splitlines()\nassert set(safe)<=set(('shared','secrets','global','platform','edge'))\nassert set(high)<=set(('data','apps/fargate','apps'))\nwith open(os.environ['GITHUB_OUTPUT'],'a') as f:\n    for layer in ('shared','secrets','global','data','platform','apps','edge'):\n        revision=os.environ['HIGH_REVISION'] if layer in ('data','apps') else os.environ['REVISION']\n        value={'operation_id':str(uuid.uuid4()),'operation':'reconcile','layer':layer,'revision':revision,'parameters':{}}\n        f.write(layer+'='+json.dumps(value,separators=(',',':'))+'\\n')\n        if layer in high or (layer=='apps' and 'apps/fargate' in high):print(json.dumps(value,separators=(',',':')))\nPY"
+        }
+      ]
+    },
+    "dev-shared": {
+      "runs-on": "ubuntu-latest",
+      "permissions": {},
+      "steps": [
+        {
+          "run": "echo \"::error::E1 infra-dev is inactive: no verified immutable workflow pin, installation and governance binding.\"; exit 1"
+        }
+      ],
+      "needs": [
+        "scope",
+        "prepare-dev"
+      ],
+      "if": "${{ always() && github.ref == 'refs/heads/develop' && needs['prepare-dev'].result == 'success' && contains(needs.scope.outputs.safe_layers, 'shared') }}"
+    },
+    "dev-secrets": {
+      "runs-on": "ubuntu-latest",
+      "permissions": {},
+      "steps": [
+        {
+          "run": "echo \"::error::E1 infra-dev is inactive: no verified immutable workflow pin, installation and governance binding.\"; exit 1"
+        }
+      ],
+      "needs": [
+        "scope",
+        "prepare-dev",
+        "dev-shared"
+      ],
+      "if": "${{ always() && github.ref == 'refs/heads/develop' && needs['prepare-dev'].result == 'success' && contains(needs.scope.outputs.safe_layers, 'secrets') && (needs['dev-shared'].result == 'success' || needs['dev-shared'].result == 'skipped') }}"
+    },
+    "dev-global": {
+      "runs-on": "ubuntu-latest",
+      "permissions": {},
+      "steps": [
+        {
+          "run": "echo \"::error::E1 infra-dev is inactive: no verified immutable workflow pin, installation and governance binding.\"; exit 1"
+        }
+      ],
+      "needs": [
+        "scope",
+        "prepare-dev",
+        "dev-shared",
+        "dev-secrets"
+      ],
+      "if": "${{ always() && github.ref == 'refs/heads/develop' && needs['prepare-dev'].result == 'success' && contains(needs.scope.outputs.safe_layers, 'global') && (needs['dev-shared'].result == 'success' || needs['dev-shared'].result == 'skipped') && (needs['dev-secrets'].result == 'success' || needs['dev-secrets'].result == 'skipped') }}"
+    },
+    "dev-platform": {
+      "runs-on": "ubuntu-latest",
+      "permissions": {},
+      "steps": [
+        {
+          "run": "echo \"::error::E1 infra-dev is inactive: no verified immutable workflow pin, installation and governance binding.\"; exit 1"
+        }
+      ],
+      "needs": [
+        "scope",
+        "prepare-dev",
+        "dev-shared",
+        "dev-secrets",
+        "dev-global"
+      ],
+      "if": "${{ always() && github.ref == 'refs/heads/develop' && needs['prepare-dev'].result == 'success' && contains(needs.scope.outputs.safe_layers, 'platform') && (needs['dev-shared'].result == 'success' || needs['dev-shared'].result == 'skipped') && (needs['dev-secrets'].result == 'success' || needs['dev-secrets'].result == 'skipped') && (needs['dev-global'].result == 'success' || needs['dev-global'].result == 'skipped') }}"
+    },
+    "dev-edge": {
+      "runs-on": "ubuntu-latest",
+      "permissions": {},
+      "steps": [
+        {
+          "run": "echo \"::error::E1 infra-dev is inactive: no verified immutable workflow pin, installation and governance binding.\"; exit 1"
+        }
+      ],
+      "needs": [
+        "scope",
+        "prepare-dev",
+        "dev-shared",
+        "dev-secrets",
+        "dev-global",
+        "dev-platform"
+      ],
+      "if": "${{ always() && github.ref == 'refs/heads/develop' && needs['prepare-dev'].result == 'success' && contains(needs.scope.outputs.safe_layers, 'edge') && (needs['dev-shared'].result == 'success' || needs['dev-shared'].result == 'skipped') && (needs['dev-secrets'].result == 'success' || needs['dev-secrets'].result == 'skipped') && (needs['dev-global'].result == 'success' || needs['dev-global'].result == 'skipped') && (needs['dev-platform'].result == 'success' || needs['dev-platform'].result == 'skipped') }}"
+    },
+    "dev-data": {
+      "runs-on": "ubuntu-latest",
+      "permissions": {},
+      "steps": [
+        {
+          "run": "echo \"::error::E1 infra-high-risk-dev is inactive: no verified immutable workflow pin, installation and governance binding.\"; exit 1"
+        }
+      ],
+      "needs": [
+        "scope",
+        "prepare-dev",
+        "dev-shared",
+        "dev-secrets",
+        "dev-global",
+        "dev-platform",
+        "dev-edge"
+      ],
+      "if": "${{ always() && github.ref == 'refs/heads/develop' && needs['prepare-dev'].result == 'success' && contains(needs.scope.outputs.high_risk_layers, 'data') && (needs['dev-shared'].result == 'success' || needs['dev-shared'].result == 'skipped') && (needs['dev-secrets'].result == 'success' || needs['dev-secrets'].result == 'skipped') && (needs['dev-global'].result == 'success' || needs['dev-global'].result == 'skipped') && (needs['dev-platform'].result == 'success' || needs['dev-platform'].result == 'skipped') && (needs['dev-edge'].result == 'success' || needs['dev-edge'].result == 'skipped') }}"
+    },
+    "dev-apps": {
+      "runs-on": "ubuntu-latest",
+      "permissions": {},
+      "steps": [
+        {
+          "run": "echo \"::error::E1 infra-high-risk-dev is inactive: no verified immutable workflow pin, installation and governance binding.\"; exit 1"
+        }
+      ],
+      "needs": [
+        "scope",
+        "prepare-dev",
+        "dev-shared",
+        "dev-secrets",
+        "dev-global",
+        "dev-platform",
+        "dev-edge",
+        "dev-data"
+      ],
+      "if": "${{ always() && github.ref == 'refs/heads/develop' && needs['prepare-dev'].result == 'success' && contains(needs.scope.outputs.high_risk_layers, 'apps') && (needs['dev-shared'].result == 'success' || needs['dev-shared'].result == 'skipped') && (needs['dev-secrets'].result == 'success' || needs['dev-secrets'].result == 'skipped') && (needs['dev-global'].result == 'success' || needs['dev-global'].result == 'skipped') && (needs['dev-platform'].result == 'success' || needs['dev-platform'].result == 'skipped') && (needs['dev-edge'].result == 'success' || needs['dev-edge'].result == 'skipped') && (needs['dev-data'].result == 'success' || needs['dev-data'].result == 'skipped') }}"
+    },
+    "prepare-prod": {
+      "needs": [
+        "scope"
+      ],
+      "if": "${{ github.ref == 'refs/heads/main' && needs.scope.outputs.critical_manual_only_changed != 'true' && needs.scope.outputs.unmapped_high_risk_paths == '' }}",
+      "runs-on": "ubuntu-latest",
+      "permissions": {},
+      "outputs": {
+        "shared": "${{ steps.requests.outputs.shared }}",
+        "secrets": "${{ steps.requests.outputs.secrets }}",
+        "global": "${{ steps.requests.outputs.global }}",
+        "data": "${{ steps.requests.outputs.data }}",
+        "platform": "${{ steps.requests.outputs.platform }}",
+        "apps": "${{ steps.requests.outputs.apps }}",
+        "edge": "${{ steps.requests.outputs.edge }}"
+      },
+      "steps": [
+        {
+          "id": "requests",
+          "shell": "bash",
+          "env": {
+            "SAFE": "${{ needs.scope.outputs.safe_layers }}",
+            "HIGH": "${{ needs.scope.outputs.high_risk_layers }}",
+            "REVISION": "${{ vars.E1_INFRA_PROD_REVISION }}",
+            "HIGH_REVISION": "${{ vars.E1_INFRA_HIGH_RISK_PROD_REVISION }}"
+          },
+          "run": "python3 -I -B - <<'PY'\nimport json,os,uuid\nsafe=os.environ['SAFE'].splitlines();high=os.environ['HIGH'].splitlines()\nassert set(safe)<=set(('shared','secrets','global','platform','edge'))\nassert set(high)<=set(('data','apps/fargate','apps'))\nwith open(os.environ['GITHUB_OUTPUT'],'a') as f:\n    for layer in ('shared','secrets','global','data','platform','apps','edge'):\n        revision=os.environ['HIGH_REVISION'] if layer in ('data','apps') else os.environ['REVISION']\n        value={'operation_id':str(uuid.uuid4()),'operation':'reconcile','layer':layer,'revision':revision,'parameters':{}}\n        f.write(layer+'='+json.dumps(value,separators=(',',':'))+'\\n')\n        if layer in high or (layer=='apps' and 'apps/fargate' in high):print(json.dumps(value,separators=(',',':')))\nPY"
+        }
+      ]
+    },
+    "prod-shared": {
+      "runs-on": "ubuntu-latest",
+      "permissions": {},
+      "steps": [
+        {
+          "run": "echo \"::error::E1 infra-prod is inactive: no verified immutable workflow pin, installation and governance binding.\"; exit 1"
+        }
+      ],
+      "needs": [
+        "scope",
+        "prepare-prod"
+      ],
+      "if": "${{ always() && github.ref == 'refs/heads/main' && needs['prepare-prod'].result == 'success' && contains(needs.scope.outputs.safe_layers, 'shared') }}"
+    },
+    "prod-secrets": {
+      "runs-on": "ubuntu-latest",
+      "permissions": {},
+      "steps": [
+        {
+          "run": "echo \"::error::E1 infra-prod is inactive: no verified immutable workflow pin, installation and governance binding.\"; exit 1"
+        }
+      ],
+      "needs": [
+        "scope",
+        "prepare-prod",
+        "prod-shared"
+      ],
+      "if": "${{ always() && github.ref == 'refs/heads/main' && needs['prepare-prod'].result == 'success' && contains(needs.scope.outputs.safe_layers, 'secrets') && (needs['prod-shared'].result == 'success' || needs['prod-shared'].result == 'skipped') }}"
+    },
+    "prod-global": {
+      "runs-on": "ubuntu-latest",
+      "permissions": {},
+      "steps": [
+        {
+          "run": "echo \"::error::E1 infra-prod is inactive: no verified immutable workflow pin, installation and governance binding.\"; exit 1"
+        }
+      ],
+      "needs": [
+        "scope",
+        "prepare-prod",
+        "prod-shared",
+        "prod-secrets"
+      ],
+      "if": "${{ always() && github.ref == 'refs/heads/main' && needs['prepare-prod'].result == 'success' && contains(needs.scope.outputs.safe_layers, 'global') && (needs['prod-shared'].result == 'success' || needs['prod-shared'].result == 'skipped') && (needs['prod-secrets'].result == 'success' || needs['prod-secrets'].result == 'skipped') }}"
+    },
+    "prod-platform": {
+      "runs-on": "ubuntu-latest",
+      "permissions": {},
+      "steps": [
+        {
+          "run": "echo \"::error::E1 infra-prod is inactive: no verified immutable workflow pin, installation and governance binding.\"; exit 1"
+        }
+      ],
+      "needs": [
+        "scope",
+        "prepare-prod",
+        "prod-shared",
+        "prod-secrets",
+        "prod-global"
+      ],
+      "if": "${{ always() && github.ref == 'refs/heads/main' && needs['prepare-prod'].result == 'success' && contains(needs.scope.outputs.safe_layers, 'platform') && (needs['prod-shared'].result == 'success' || needs['prod-shared'].result == 'skipped') && (needs['prod-secrets'].result == 'success' || needs['prod-secrets'].result == 'skipped') && (needs['prod-global'].result == 'success' || needs['prod-global'].result == 'skipped') }}"
+    },
+    "prod-edge": {
+      "runs-on": "ubuntu-latest",
+      "permissions": {},
+      "steps": [
+        {
+          "run": "echo \"::error::E1 infra-prod is inactive: no verified immutable workflow pin, installation and governance binding.\"; exit 1"
+        }
+      ],
+      "needs": [
+        "scope",
+        "prepare-prod",
+        "prod-shared",
+        "prod-secrets",
+        "prod-global",
+        "prod-platform"
+      ],
+      "if": "${{ always() && github.ref == 'refs/heads/main' && needs['prepare-prod'].result == 'success' && contains(needs.scope.outputs.safe_layers, 'edge') && (needs['prod-shared'].result == 'success' || needs['prod-shared'].result == 'skipped') && (needs['prod-secrets'].result == 'success' || needs['prod-secrets'].result == 'skipped') && (needs['prod-global'].result == 'success' || needs['prod-global'].result == 'skipped') && (needs['prod-platform'].result == 'success' || needs['prod-platform'].result == 'skipped') }}"
+    },
+    "prod-data": {
+      "runs-on": "ubuntu-latest",
+      "permissions": {},
+      "steps": [
+        {
+          "run": "echo \"::error::E1 infra-high-risk-prod is inactive: no verified immutable workflow pin, installation and governance binding.\"; exit 1"
+        }
+      ],
+      "needs": [
+        "scope",
+        "prepare-prod",
+        "prod-shared",
+        "prod-secrets",
+        "prod-global",
+        "prod-platform",
+        "prod-edge"
+      ],
+      "if": "${{ always() && github.ref == 'refs/heads/main' && needs['prepare-prod'].result == 'success' && contains(needs.scope.outputs.high_risk_layers, 'data') && (needs['prod-shared'].result == 'success' || needs['prod-shared'].result == 'skipped') && (needs['prod-secrets'].result == 'success' || needs['prod-secrets'].result == 'skipped') && (needs['prod-global'].result == 'success' || needs['prod-global'].result == 'skipped') && (needs['prod-platform'].result == 'success' || needs['prod-platform'].result == 'skipped') && (needs['prod-edge'].result == 'success' || needs['prod-edge'].result == 'skipped') }}"
+    },
+    "prod-apps": {
+      "runs-on": "ubuntu-latest",
+      "permissions": {},
+      "steps": [
+        {
+          "run": "echo \"::error::E1 infra-high-risk-prod is inactive: no verified immutable workflow pin, installation and governance binding.\"; exit 1"
+        }
+      ],
+      "needs": [
+        "scope",
+        "prepare-prod",
+        "prod-shared",
+        "prod-secrets",
+        "prod-global",
+        "prod-platform",
+        "prod-edge",
+        "prod-data"
+      ],
+      "if": "${{ always() && github.ref == 'refs/heads/main' && needs['prepare-prod'].result == 'success' && contains(needs.scope.outputs.high_risk_layers, 'apps') && (needs['prod-shared'].result == 'success' || needs['prod-shared'].result == 'skipped') && (needs['prod-secrets'].result == 'success' || needs['prod-secrets'].result == 'skipped') && (needs['prod-global'].result == 'success' || needs['prod-global'].result == 'skipped') && (needs['prod-platform'].result == 'success' || needs['prod-platform'].result == 'skipped') && (needs['prod-edge'].result == 'success' || needs['prod-edge'].result == 'skipped') && (needs['prod-data'].result == 'success' || needs['prod-data'].result == 'skipped') }}"
+    },
+    "infra-ready": {
+      "runs-on": "ubuntu-latest",
+      "permissions": {},
+      "steps": [
+        {
+          "run": "echo \"::error::E1 plan-dev is inactive: no verified immutable workflow pin, installation and governance binding.\"; exit 1"
+        }
+      ],
+      "needs": [
+        "scope",
+        "prepare-dev",
+        "dev-shared",
+        "dev-secrets",
+        "dev-global",
+        "dev-platform",
+        "dev-edge",
+        "dev-data",
+        "dev-apps"
+      ],
+      "if": "${{ always() && github.ref == 'refs/heads/develop' && needs['prepare-dev'].result == 'success' && needs.scope.outputs.app_changed == 'true' && (needs['dev-shared'].result == 'success' || needs['dev-shared'].result == 'skipped') && (needs['dev-secrets'].result == 'success' || needs['dev-secrets'].result == 'skipped') && (needs['dev-global'].result == 'success' || needs['dev-global'].result == 'skipped') && (needs['dev-platform'].result == 'success' || needs['dev-platform'].result == 'skipped') && (needs['dev-edge'].result == 'success' || needs['dev-edge'].result == 'skipped') && (needs['dev-data'].result == 'success' || needs['dev-data'].result == 'skipped') && (needs['dev-apps'].result == 'success' || needs['dev-apps'].result == 'skipped') }}"
+    },
+    "release": {
+      "runs-on": "ubuntu-latest",
+      "permissions": {},
+      "steps": [
+        {
+          "run": "echo \"::error::E1 release is inactive: no verified immutable workflow pin, installation and governance binding.\"; exit 1"
+        }
+      ],
+      "needs": [
+        "infra-ready"
+      ]
+    },
+    "deploy": {
+      "runs-on": "ubuntu-latest",
+      "permissions": {},
+      "steps": [
+        {
+          "run": "echo \"::error::E1 deploy-dev is inactive: no verified immutable workflow pin, installation and governance binding.\"; exit 1"
+        }
+      ],
+      "needs": [
+        "release"
+      ],
+      "concurrency": {
+        "group": "e1-application-delivery-dev",
+        "cancel-in-progress": false
+      }
+    },
+    "critical-blocked": {
+      "needs": [
+        "scope"
+      ],
+      "if": "${{ needs.scope.outputs.critical_manual_only_changed == 'true' || needs.scope.outputs.unmapped_high_risk_paths != '' }}",
+      "runs-on": "ubuntu-latest",
+      "permissions": {},
+      "steps": [
+        {
+          "run": "echo \"::error::Critical or unmapped infrastructure requires the protected manual lifecycle path; application delivery blocked.\"; exit 1"
+        }
+      ]
+    },
+    "prod-notice": {
+      "needs": [
+        "scope"
+      ],
+      "if": "${{ github.ref == 'refs/heads/main' && needs.scope.outputs.app_changed == 'true' }}",
+      "runs-on": "ubuntu-latest",
+      "permissions": {},
+      "steps": [
+        {
+          "run": "echo \"Production promotion requires the separate manual promote-prod request with the exact qualified release ID.\" >> \"$GITHUB_STEP_SUMMARY\""
+        }
+      ]
+    }
+  }
+}

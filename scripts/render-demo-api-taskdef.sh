@@ -1,0 +1,305 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+ENV_NAME="dev"
+AWS_REGION_NAME="us-east-1"
+ACCOUNT_ID=""
+COLOR=""
+IMAGE_URI=""
+DB_SECRET_ID=""
+KMS_KEY_ID=""
+OUTPUT_FILE=""
+RECOVERY_MODE=false
+DATABASE_SECURITY_PLAN=""
+DATABASE_SECURITY_ENV="[]"
+DATABASE_CONFIG=""
+SQL_TRUST_MANIFEST=""
+ENVIRONMENT_BINDING=""
+TEMPLATE_FILE="$ROOT_DIR/demo-api/deploy/task-definition.template.json"
+
+usage() {
+  cat <<'EOF'
+Usage:
+  scripts/render-demo-api-taskdef.sh --env ENV --region REGION --account-id ACCOUNT \
+    --color blue|green --image-uri ECR_URI@sha256:... --db-secret-id ARN:::VERSION \
+    --kms-key-id KEY_ARN --database-config PUBLIC_JSON --sql-trust-manifest PUBLIC_JSON \
+    --environment-binding ADMIN_BINDING_JSON --output FILE
+
+Ordinary DEV and PROD require explicit validated-v2 identity and public trust.
+The binding is an independently authenticated current E1_DELIVERY_BINDING_V1
+administrative readback. It cannot be constructed from the candidate secret ARN.
+Only the API receives configuration; the same-image probe remains independent.
+Renders the versioned Demo API ECS task definition template. The rendered output
+is suitable for aws ecs register-task-definition --cli-input-json file://FILE.
+--recovery without --database-config preserves the HISTORICAL renderer for old
+qualified images (not the new common image): it requires a pinned connection-secret
+version and exact KMS key ARN, and disables startup migrations only on the app.
+It neither selects an installed WP4 binding nor registers or switches anything.
+EOF
+}
+
+die() {
+  printf '[ERROR] %s\n' "$*" >&2
+  exit 1
+}
+
+require_command() {
+  command -v "$1" >/dev/null 2>&1 || die "$1 is required but was not found in PATH."
+}
+
+parse_args() {
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      --env)
+        ENV_NAME="${2:-}"
+        shift 2
+        ;;
+      --region)
+        AWS_REGION_NAME="${2:-}"
+        shift 2
+        ;;
+      --account-id)
+        ACCOUNT_ID="${2:-}"
+        shift 2
+        ;;
+      --color)
+        COLOR="${2:-}"
+        shift 2
+        ;;
+      --image-uri)
+        IMAGE_URI="${2:-}"
+        shift 2
+        ;;
+      --db-secret-id|--db-secret-arn)
+        DB_SECRET_ID="${2:-}"
+        shift 2
+        ;;
+      --kms-key-id)
+        KMS_KEY_ID="${2:-}"
+        shift 2
+        ;;
+      --template)
+        TEMPLATE_FILE="${2:-}"
+        shift 2
+        ;;
+      --database-security-plan)
+        DATABASE_SECURITY_PLAN="${2:-}"
+        shift 2
+        ;;
+      --database-config)
+        DATABASE_CONFIG="${2:-}"; shift 2 ;;
+      --sql-trust-manifest)
+        SQL_TRUST_MANIFEST="${2:-}"; shift 2 ;;
+      --environment-binding)
+        ENVIRONMENT_BINDING="${2:-}"; shift 2 ;;
+      --recovery)
+        RECOVERY_MODE=true
+        shift
+        ;;
+      --output)
+        OUTPUT_FILE="${2:-}"
+        shift 2
+        ;;
+      -h|--help)
+        usage
+        exit 0
+        ;;
+      *)
+        die "Unknown option: $1"
+        ;;
+    esac
+  done
+}
+
+validate_args() {
+  case "$ENV_NAME" in
+    dev|prod) ;;
+    *) die "Unsupported --env '$ENV_NAME'. Supported values: dev, prod." ;;
+  esac
+
+  case "$COLOR" in
+    blue|green) ;;
+    *) die "--color must be blue or green." ;;
+  esac
+
+  if ! [[ "$ACCOUNT_ID" =~ ^[0-9]{12}$ ]]; then
+    die "--account-id must be a 12-digit AWS account ID."
+  fi
+
+  if ! [[ "$IMAGE_URI" =~ ^.+@sha256:[a-f0-9]{64}$ ]]; then
+    die "--image-uri must be an immutable ECR image URI ending in @sha256:<64 lowercase hex chars>."
+  fi
+
+  if ! [[ "$DB_SECRET_ID" =~ ^arn:aws:secretsmanager:[A-Za-z0-9-]+:[0-9]{12}:secret:.+ ]]; then
+    die "--db-secret-id must be a full Secrets Manager ARN."
+  fi
+
+  if [ "$RECOVERY_MODE" = true ] || [ -n "$DATABASE_CONFIG" ]; then
+    if [ "$RECOVERY_MODE" = true ]; then
+      [ "$ENV_NAME" = dev ] || die "Recovery profile is currently reviewed for dev only."
+    fi
+    [[ "$AWS_REGION_NAME" =~ ^[a-z]{2}-[a-z]+-[0-9]$ ]] || die "Invalid recovery region."
+    [[ "$DB_SECRET_ID" =~ ^arn:aws:secretsmanager:${AWS_REGION_NAME}:${ACCOUNT_ID}:secret:[A-Za-z0-9/_+=.@-]+:::[A-Za-z0-9-]{32,64}$ ]] || die "Recovery requires an exact same-account/region secret version."
+    [[ "$IMAGE_URI" =~ ^${ACCOUNT_ID}\.dkr\.ecr\.${AWS_REGION_NAME}\.amazonaws\.com/[a-z0-9][a-z0-9._/-]*@sha256:[a-f0-9]{64}$ ]] || die "Recovery image must belong to this account and region."
+    [[ "$KMS_KEY_ID" =~ ^arn:aws:kms:${AWS_REGION_NAME}:${ACCOUNT_ID}:key/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$ ]] || die "Recovery requires an explicit same-account/region KMS key ARN."
+  fi
+
+  if [ -n "$DATABASE_CONFIG" ]; then
+    [ -z "$DATABASE_SECURITY_PLAN" ] || die "Ordinary configuration and historical recovery plan cannot be mixed."
+    [ -n "$ENVIRONMENT_BINDING" ] && [ -f "$ENVIRONMENT_BINDING" ] || die "Independent administrative environment binding required (including PROD)."
+    require_command python3
+    python3 "$ROOT_DIR/scripts/validate-sql-secret-binding.py" \
+      --binding "$ENVIRONMENT_BINDING" --environment "$ENV_NAME" \
+      --account "$ACCOUNT_ID" --region "$AWS_REGION_NAME" --color "$COLOR" \
+      --secret "$DB_SECRET_ID" || die "SQL secret is not authorized by the destination binding."
+    [ -f "$DATABASE_CONFIG" ] && [ -f "$SQL_TRUST_MANIFEST" ] || die "Database configuration and public trust manifest are required."
+    local document
+    for document in "$DATABASE_CONFIG" "$SQL_TRUST_MANIFEST"; do
+      jq --stream -se 'map(if length == 2 then .[0] else .[0][0:-1] end) | group_by(.) | all(length == 1)' "$document" >/dev/null || die "Duplicate JSON keys refused."
+    done
+    DATABASE_SECURITY_ENV="$(jq -sce --arg env "$ENV_NAME" '
+      if length == 1 and (.[0] |
+        keys == ["certificate_hostname","database","endpoint","environment","profile","runtime_user","schema"] and
+        .schema == "SQL_RUNTIME_IDENTITY_V1" and .environment == $env and .profile == "validated-v2" and
+        (.endpoint | type == "string" and test("^tcp:[A-Za-z0-9.-]+,1433$")) and
+        (.database | type == "string" and test("^[A-Za-z][A-Za-z0-9_]{0,127}$") and . != "master" and . != "model" and . != "msdb" and . != "tempdb") and
+        (.runtime_user | type == "string" and test("^[A-Za-z][A-Za-z0-9_]{0,127}$") and ascii_downcase != "sa") and
+        (.certificate_hostname | type == "string" and test("^[A-Za-z0-9][A-Za-z0-9.-]+[.][A-Za-z0-9-]+$")))
+      then .[0] | [
+        {name:"Database__SecurityProfile",value:.profile},
+        {name:"Database__ExpectedRuntimeUser",value:.runtime_user},
+        {name:"Database__ExpectedSqlEndpoint",value:.endpoint},
+        {name:"Database__ExpectedDatabase",value:.database},
+        {name:"Database__ExpectedCertificateHostName",value:.certificate_hostname}]
+      else error("STRICT_DATABASE_CONFIG_REQUIRED") end' "$DATABASE_CONFIG")" || die "Ordinary database configuration refused."
+    local hostname trust_b64 trust_sha
+    hostname="$(jq -r .certificate_hostname "$DATABASE_CONFIG")"
+    [ "$(wc -c < "$SQL_TRUST_MANIFEST")" -le 30000 ] || die "Public trust manifest exceeds limit."
+    jq -se --arg env "$ENV_NAME" --arg host "$hostname" 'length == 1 and (.[0] |
+      (keys == ["anchors","environment","hostname","schema","version"] or keys == ["anchors","environment","hostname","schema","transition","version"]) and
+      .schema == "SQL_TLS_TRUST_V1" and .environment == $env and .hostname == $host and
+      (.version | type == "string" and test("^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$")) and
+      (.anchors | type == "array" and length >= 1 and length <= 3 and all(.[];
+        keys == ["der_base64","kind","sha256"] and (.kind == "ca" or .kind == "dev-leaf-transition") and
+        (.sha256 | type == "string" and test("^[a-f0-9]{64}$")) and
+        (.der_base64 | type == "string" and test("^[A-Za-z0-9+/]+={0,2}$")))) and
+      (if has("transition") then $env == "dev" and (.transition | keys == ["not_after","not_before"] and all(.[]; type == "string" and test("^[0-9TZ:-]+$"))) else true end))' "$SQL_TRUST_MANIFEST" >/dev/null || die "Public trust identity mismatch."
+    trust_b64="$(base64 -w0 "$SQL_TRUST_MANIFEST")"
+    trust_sha="$(sha256sum "$SQL_TRUST_MANIFEST" | cut -d ' ' -f1)"
+    DATABASE_SECURITY_ENV="$(jq -c --arg pem "$trust_b64" --arg sha "$trust_sha" '. + [
+      {name:"SQL_TRUST_MANIFEST_B64",value:$pem},{name:"SQL_TRUST_MANIFEST_SHA256",value:$sha}]' <<< "$DATABASE_SECURITY_ENV")"
+  elif [ "$RECOVERY_MODE" != true ]; then
+    die "Ordinary DEV/PROD requires --database-config and --sql-trust-manifest; no legacy fallback."
+  elif [ -n "$SQL_TRUST_MANIFEST" ]; then
+    die "Public trust requires ordinary --database-config."
+  fi
+
+  if [ -n "$DATABASE_SECURITY_PLAN" ]; then
+    [ "$RECOVERY_MODE" = true ] || die "Strict database plan requires --recovery."
+    [ -f "$DATABASE_SECURITY_PLAN" ] || die "Strict database plan is missing."
+    DATABASE_SECURITY_ENV="$(jq -ce --arg secret "$DB_SECRET_ID" --arg image "$IMAGE_URI" '
+      . as $p | .DatabaseSecurity as $s |
+      if ($s | type) == "object" and
+        ($s | keys) == ["CertificateHostName","MigrationSecretArn","MigrationUser","Profile","RuntimeUser"] and
+        $s.Profile == "validated-v2" and $s.RuntimeUser == "recovery_app" and
+        $s.MigrationUser == "recovery_migrator" and $s.CertificateHostName == "sql.demo.internal" and
+        ($s.MigrationSecretArn | test("^arn:aws:secretsmanager:us-east-1:341936017254:secret:demo/dev/db/sql-migrator-password-[A-Za-z0-9]{6}$")) and
+        ($p.Connection.SecretArn + ":::" + $p.Connection.VersionId) == $secret and
+        $p.Release.image_uri == $image and $p.Network.DbPrivateIp == $p.Connection.Endpoint and
+        ($p.Connection.Endpoint | test("^(10\\.[0-9.]+|172\\.[0-9.]+|192\\.168\\.[0-9.]+)$")) and
+        $p.Connection.Database == ("recoverydb_restore_" + $p.Trial) and
+        ($p.Trial | test("^r[0-9]{8}[a-z0-9]{1,8}$"))
+      then [
+        {name:"Database__SecurityProfile",value:$s.Profile},
+        {name:"Database__ExpectedRuntimeUser",value:$s.RuntimeUser},
+        {name:"Database__ExpectedSqlEndpoint",value:("tcp:"+$p.Connection.Endpoint+",1433")},
+        {name:"Database__ExpectedDatabase",value:$p.Connection.Database},
+        {name:"Database__ExpectedCertificateHostName",value:$s.CertificateHostName}]
+      else error("STRICT_DATABASE_PLAN_MISMATCH") end' "$DATABASE_SECURITY_PLAN")" || die "Strict database plan refused."
+  fi
+
+  [ -f "$TEMPLATE_FILE" ] || die "Template file not found: $TEMPLATE_FILE"
+  [ -n "$OUTPUT_FILE" ] || die "--output is required."
+
+  if [ -z "$KMS_KEY_ID" ]; then
+    KMS_KEY_ID="alias/${ENV_NAME}-kms-service"
+  fi
+}
+
+render_task_definition() {
+  local app_name
+  local probe_name
+  local execution_role_arn
+  local task_role_arn
+  local log_group
+  local output_dir
+
+  app_name="demo-${ENV_NAME}-app-api-${COLOR}"
+  probe_name="${app_name}-readiness-probe"
+  execution_role_arn="arn:aws:iam::${ACCOUNT_ID}:role/${app_name}-exec-role"
+  task_role_arn="arn:aws:iam::${ACCOUNT_ID}:role/${app_name}-task-role"
+  log_group="/aws/ecs/${app_name}"
+  output_dir="$(dirname "$OUTPUT_FILE")"
+
+  mkdir -p "$output_dir"
+
+  jq \
+    --argjson recovery_mode "$RECOVERY_MODE" \
+    --arg ordinary_config "$DATABASE_CONFIG" \
+    --argjson database_security_env "$DATABASE_SECURITY_ENV" \
+    --arg family "$app_name" \
+    --arg container_name "$app_name" \
+    --arg probe_name "$probe_name" \
+    --arg image_uri "$IMAGE_URI" \
+    --arg execution_role_arn "$execution_role_arn" \
+    --arg task_role_arn "$task_role_arn" \
+    --arg aws_region "$AWS_REGION_NAME" \
+    --arg app_env "$ENV_NAME" \
+    --arg deployment "$COLOR" \
+    --arg kms_key_id "$KMS_KEY_ID" \
+    --arg db_secret_id "$DB_SECRET_ID" \
+    --arg log_group "$log_group" \
+    '
+      def set_env($name; $value):
+        .containerDefinitions[0].environment |= map(
+          if .name == $name then .value = $value else . end
+        );
+
+      .family = $family
+      | .executionRoleArn = $execution_role_arn
+      | .taskRoleArn = $task_role_arn
+      | .containerDefinitions[0].name = $container_name
+      | .containerDefinitions[0].image = $image_uri
+      | .containerDefinitions[1].name = $probe_name
+      | .containerDefinitions[1].image = $image_uri
+      | set_env("AWS_REGION"; $aws_region)
+      | set_env("APP_ENV"; $app_env)
+      | set_env("DEPLOYMENT"; $deployment)
+      | set_env("KMS_KEY_ID"; $kms_key_id)
+      | if $recovery_mode or $ordinary_config != "" then
+          .containerDefinitions[0].environment |=
+            (map(select(.name != "Database__RunMigrationsOnStartup"))
+             + [{"name":"Database__RunMigrationsOnStartup","value":"false"}] + $database_security_env)
+        else . end
+      | .containerDefinitions[0].secrets[0].valueFrom = $db_secret_id
+      | .containerDefinitions[0].logConfiguration.options["awslogs-group"] = $log_group
+      | .containerDefinitions[0].logConfiguration.options["awslogs-region"] = $aws_region
+      | .containerDefinitions[0].logConfiguration.options["awslogs-stream-prefix"] = $container_name
+      | .containerDefinitions[1].logConfiguration.options["awslogs-group"] = $log_group
+      | .containerDefinitions[1].logConfiguration.options["awslogs-region"] = $aws_region
+      | .containerDefinitions[1].logConfiguration.options["awslogs-stream-prefix"] = $probe_name
+    ' "$TEMPLATE_FILE" > "$OUTPUT_FILE"
+}
+
+main() {
+  parse_args "$@"
+  require_command jq
+  validate_args
+  render_task_definition
+}
+
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+  main "$@"
+fi

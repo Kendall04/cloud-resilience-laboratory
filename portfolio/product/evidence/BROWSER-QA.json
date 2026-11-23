@@ -1,0 +1,197 @@
+{
+  "kind": "DEMO_AND_HTTP_DOUBLES_NOT_AWS",
+  "at": "2026-11-20T23:34:00.208Z",
+  "checks": [
+    "Keyboard skip link",
+    "DEMO create/read/reset and literal XSS",
+    "Three honest historical replays, pause/step/reset",
+    "Five pinned diagrams desktop/mobile, zoom/fit, opaque sandbox, sources, reader and text alternative",
+    "DEMO zero API/external calls, keyboard routes/Escape, 320/390/768/1440/1920 responsive",
+    "Reproducible static package: direct/trailing-slash routes, DEMO write/read and isolated diagram without backend",
+    "HTTP 503 / timeout / lost connection / expired in-memory capability: no synthetic fallback"
+  ],
+  "captures": [
+    {
+      "file": "mobile-reading-ecs-trust.png",
+      "sha256": "f4cb1a63b50ca48ce2a52662ab776a7f26ad85542451c3fd509fd626c5d7b8ed"
+    },
+    {
+      "file": "390-architecture.png",
+      "sha256": "850e0893d9b50e1215435035615c5683d16b4c60e5b0921cb1890e261556c45b"
+    },
+    {
+      "file": "1440-architecture.png",
+      "sha256": "56c4201e08f7484eaa7073cc95e67f1a17d762d312e369205d06caa157cdbcc2"
+    }
+  ],
+  "externalRequests": [],
+  "browserErrors": [],
+  "staticManifest": {
+    "schema": "ECS_PORTFOLIO_STATIC_V1",
+    "edition": "demo",
+    "files": [
+      {
+        "path": "architecture/index.html",
+        "bytes": 3007,
+        "sha256": "f7106b1fcdea4835b36f570180532fc375fa9f7f2fff1f82c0324a70c6b897d7"
+      },
+      {
+        "path": "assets/api.mjs",
+        "bytes": 4251,
+        "sha256": "4795f2690605d7f9c308d929d78c68a2d836c1a44a41a47f7ce2b2d9960aff17"
+      },
+      {
+        "path": "assets/app.mjs",
+        "bytes": 33119,
+        "sha256": "fd8b9732cc5207a4ee0b6213e7031b4ac8e8168f93651aaef5a6b178e5875a2c"
+      },
+      {
+        "path": "assets/atlas.mjs",
+        "bytes": 22261,
+        "sha256": "32610cf9f89bae80d80312c5695d80c4958d8be0c3a242405631f9f6d598f85e"
+      },
+      {
+        "path": "assets/config.mjs",
+        "bytes": 28,
+        "sha256": "ca0cdc33e4b6c6f950b71ab16db2dbab6adfd3d1f37546ffe40d2cc14edbe6f5"
+      },
+      {
+        "path": "assets/data.mjs",
+        "bytes": 4073,
+        "sha256": "48cd6722dae3ccc58ea923fd917ea32cd44ebfbb9c9cbc51ac4c310dd8a17139"
+      },
+      {
+        "path": "assets/fonts/OFL.txt",
+        "bytes": 4385,
+        "sha256": "ba0b9729c9428ba79a0459ab8ec575791b51509dbec213e383d0316d37fec299"
+      },
+      {
+        "path": "assets/fonts/sora-regular.ttf",
+        "bytes": 46040,
+        "sha256": "1b547e90e4c49aa12e9a35ca8acc91732e188aa9fdbe08d2299ea4d4cae72145"
+      },
+      {
+        "path": "assets/fonts/sora-semibold.ttf",
+        "bytes": 46216,
+        "sha256": "4e79171a1720d04b72eb68bd7604f85888c31c05bb6b432147d4524e9439af30"
+      },
+      {
+        "path": "assets/style.css",
+        "bytes": 30203,
+        "sha256": "5c91efaaf7bdbc2eddc2392878ec925de298d2003a7f623f7005684cd498c538"
+      },
+      {
+        "path": "assets/visuals.mjs",
+        "bytes": 4711,
+        "sha256": "a5e89b0544dd62d2f2e54c39bd078c449e644f48e32710ff154d0e097eeb5a7b"
+      },
+      {
+        "path": "demo/index.html",
+        "bytes": 3007,
+        "sha256": "f7106b1fcdea4835b36f570180532fc375fa9f7f2fff1f82c0324a70c6b897d7"
+      },
+      {
+        "path": "diagrams/ecs-delivery.html",
+        "bytes": 828835,
+        "sha256": "4c7b6470ba8cdfd7296ef986d97a3fd5f6a0a6a9f3a1c79498562cd126d224f3"
+      },
+      {
+        "path": "diagrams/ecs-network.html",
+        "bytes": 832860,
+        "sha256": "a48152d32c1db82c7a10d9ac3d7b18d11ca14b69899efecf807a870d7ac38b8e"
+      },
+      {
+        "path": "diagrams/ecs-platform.html",
+        "bytes": 834874,
+        "sha256": "eeaebd482016e8cb99d16fb0486f9851674747964227d104955ef92f61674c67"
+      },
+      {
+        "path": "diagrams/ecs-sql-recovery.html",
+        "bytes": 833481,
+        "sha256": "4a2e4c5359f16bb9f967d90911af2f74890ab69ac70809a2d91a987275dac255"
+      },
+      {
+        "path": "diagrams/ecs-trust.html",
+        "bytes": 837865,
+        "sha256": "6763bde084cfe5770d8310bb556f83a4cb2fac431e1e9ba3bc0eec02e9e08824"
+      },
+      {
+        "path": "evidence/index.html",
+        "bytes": 3007,
+        "sha256": "f7106b1fcdea4835b36f570180532fc375fa9f7f2fff1f82c0324a70c6b897d7"
+      },
+      {
+        "path": "HOSTING.json",
+        "bytes": 738,
+        "sha256": "8446026413bab905bca97cf878da52494a900e34bdf267bef75c80dee2558e4f"
+      },
+      {
+        "path": "index.html",
+        "bytes": 3007,
+        "sha256": "f7106b1fcdea4835b36f570180532fc375fa9f7f2fff1f82c0324a70c6b897d7"
+      },
+      {
+        "path": "reading/ecs-delivery.html",
+        "bytes": 236778,
+        "sha256": "c36cec558ecf98ac3a20ee892bbbe3b2f47206c7edb423db64750a6227a3492a"
+      },
+      {
+        "path": "reading/ecs-network.html",
+        "bytes": 241692,
+        "sha256": "34be8c6df796e0b84c54e15d281a5bc8a531aac6774fc09e9b651a552f87e4e7"
+      },
+      {
+        "path": "reading/ecs-platform.html",
+        "bytes": 243786,
+        "sha256": "b5bfd2e3b39323e89f9c10fafdb595cb829f5f89c8c237e68ceede7591d62c37"
+      },
+      {
+        "path": "reading/ecs-sql-recovery.html",
+        "bytes": 242414,
+        "sha256": "ec991fad3854dbe68eb71dfaaceb646234b82089e622bad0382820df0775a5c7"
+      },
+      {
+        "path": "reading/ecs-trust.html",
+        "bytes": 247062,
+        "sha256": "0d041a17063a7cbfaec26aa87846ac06ed543d0cc0c874707f2018f7b27b4da6"
+      },
+      {
+        "path": "resilience/index.html",
+        "bytes": 3007,
+        "sha256": "f7106b1fcdea4835b36f570180532fc375fa9f7f2fff1f82c0324a70c6b897d7"
+      },
+      {
+        "path": "sources/ecs-delivery.json",
+        "bytes": 6348,
+        "sha256": "ab13264262b753bc36a06a8702e5bc2b70dfbaf575a90360376c66c632c84eb7"
+      },
+      {
+        "path": "sources/ecs-network.json",
+        "bytes": 7756,
+        "sha256": "09eca01392aa04366195faf09196b930d373bb3c905fd6a2c916c10023a3dbba"
+      },
+      {
+        "path": "sources/ecs-platform.json",
+        "bytes": 7606,
+        "sha256": "28ad5723127fb241d7e7bb77a2062668c74ed1b876a4a44ab426e7ac09e56832"
+      },
+      {
+        "path": "sources/ecs-sql-recovery.json",
+        "bytes": 7407,
+        "sha256": "aeb05a72562b5ae53fc63a958bc9b87bc7cf7719168af180838d5aff2b437fec"
+      },
+      {
+        "path": "sources/ecs-trust.json",
+        "bytes": 8736,
+        "sha256": "cdc3667666c77599ee8ed11999ee5b2ac3addc2a601863e41aa0bc829df687a0"
+      }
+    ],
+    "contentSHA256": "8a1a9a29a84b742178f0576b1a53465bd22fe497ede47eb62663948131a4e16b",
+    "awsCredentials": false,
+    "awsProxy": false
+  },
+  "status": "PASS",
+  "scope": "Summary of the existing browser runner; three representative captures retained in Git. Complete local report and 64 captures preserved privately.",
+  "executedCaptureCount": 64,
+  "completeReportSha256": "a2510b7120714b7659f149a8c994c54adfbe5cf031e2a7a3c92ee9b078f72b25"
+}

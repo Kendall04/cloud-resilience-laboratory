@@ -1,0 +1,54 @@
+{
+  "name": "Promote Prod",
+  "on": {
+    "workflow_dispatch": {
+      "inputs": {
+        "release_id": {
+          "type": "string",
+          "required": true
+        },
+        "replicas": {
+          "type": "number",
+          "default": 1,
+          "required": false
+        }
+      }
+    },
+    "workflow_call": {
+      "inputs": {
+        "release_id": {
+          "type": "string",
+          "required": true
+        },
+        "replicas": {
+          "type": "number",
+          "default": 1,
+          "required": false
+        }
+      }
+    }
+  },
+  "permissions": {
+    "contents": "read"
+  },
+  "concurrency": {
+    "group": "e1-Promote-Prod-${{ github.ref }}",
+    "cancel-in-progress": false
+  },
+  "jobs": {
+    "promote": {
+      "runs-on": "ubuntu-latest",
+      "permissions": {},
+      "steps": [
+        {
+          "run": "echo \"::error::E1 promote-prod is inactive: no verified immutable workflow pin, installation and governance binding.\"; exit 1"
+        }
+      ],
+      "if": "${{ github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch' }}",
+      "concurrency": {
+        "group": "e1-application-delivery-prod",
+        "cancel-in-progress": false
+      }
+    }
+  }
+}

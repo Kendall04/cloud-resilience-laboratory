@@ -1,0 +1,116 @@
+##############################
+# .NET / Visual Studio
+##############################
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.dbmdl
+*.nupkg
+*.snupkg
+*.lscache
+TestResults/
+coverage/
+*.trx
+*.coverage
+*.coveragexml
+
+##############################
+# Python
+##############################
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+##############################
+# Terraform
+##############################
+.terraform/
+terraform.tfstate
+terraform.tfstate.*
+*.tfstate
+*.tfstate.*
+crash.log
+*.tfplan
+*.plan
+tfplan*
+override.tf
+override.tf.json
+*.tfvars
+*.tfvars.json
+*.backup
+terraform/live/**/backend.tf
+terraform/live/**/provider.tf
+
+##############################
+# Terragrunt
+##############################
+.terragrunt-cache/
+
+##############################
+# Docker
+##############################
+*.tar
+*.img
+
+##############################
+# Logs
+##############################
+*.log
+logs/
+nohup.out
+*.out
+*.err
+*.tmp
+*.temp
+
+##############################
+# Secrets / generated bootstrap files
+##############################
+.env
+.env.*
+.envrc
+.secrets/
+.secret-bootstrap/
+*.secret
+*.secrets
+secrets.local.*
+*.pem
+*.key
+*.p12
+*.pfx
+td.json
+new-td.json
+*.zip
+
+# Terraform lock files are intentionally not ignored. Commit reviewed
+# .terraform.lock.hcl files for reproducible provider selections.
+
+##############################
+# System files
+##############################
+.DS_Store
+Thumbs.db
+
+##############################
+# Shell scripts temp
+##############################
+*.swp
+*.swo
+
+##############################
+# Windows garbage
+##############################
+*.exe
+*.dll
+*.pdb
+
+# Archify local delivery receipts contain machine-specific absolute paths.
+/docs/interactive/*.delivery.json

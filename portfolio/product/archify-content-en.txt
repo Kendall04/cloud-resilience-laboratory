@@ -1,0 +1,182 @@
+1 · Merge a develop|1 · Merge into develop
+1 · SQL origen único|1 · Single SQL source
+10 · Verificar API + backups|10 · Verify API and backups
+2 · CI del SHA integrado|2 · CI for merged SHA
+2 · Drenar y aislar origen|2 · Drain and isolate source
+3 · Backup + manifiesto S3|3 · S3 backup and manifest
+4 · Proteger copia de entrada|4 · Protect restore input
+4 · Publicar en ECR|4 · Publish to ECR
+5 · ECS color inactivo|5 · Inactive ECS color
+5 · Verificar origen terminado|5 · Verify source termination
+6 · Nueva EC2 SQL|6 · New SQL EC2 instance
+6 · Readiness por tarea|6 · Per-task readiness
+7 · Conmutar ALB|7 · Switch ALB traffic
+8 · Habilitar runtime mínimo|8 · Enable minimal runtime
+8 · Verificar, drenar, registrar|8 · Verify, drain, record
+9 · Reconectar ECS|9 · Reconnect ECS
+ALB interno|Internal ALB
+API DEV sin autenticación|Unauthenticated DEV API
+ASG + recuperación E13|NAT Instance Recovery
+Acceso privado · SG Link → ALB → API → SQL|Private access · SG Link → ALB → API → SQL
+Acceso y aplicación · subnets privadas|Access and app · private subnets
+Activar|Activate
+Administración y backup · fuera de la identidad API|Administration and backup · separate from API identity
+Administrador humano|Human administrator
+Alcance demostrado|Demonstrated scope
+Backup final|Final backup
+Backup horario|Hourly backup
+Backups SQL en S3|SQL backups in S3
+CA DEV · SELECT / INSERT|DEV CA · SELECT / INSERT
+CHECKSUM · versiones · SSE-KMS|CHECKSUM · versions · SSE-KMS
+CI verde|CI passed
+Cliente público|Public client
+Cohorte|Task cohort
+Cómo leer la plataforma|How to read the platform
+DEMOSTRADO|DEMONSTRATED
+DESPLEGADO|DEPLOYED
+Datos privados · sin HA SQL|Private data · no SQL HA
+Delivery DEV · revisiones, capacidad y forwarding ALB|DEV delivery · revisions, capacity, and ALB forwarding
+Digest fijo|Pinned digest
+Disco cifrado conservado|Encrypted disk retained
+Dos momentos de una recuperación|Two stages of recovery
+ECS V2 · CD DEV automático y ownership|ECS V2 · DEV CI/CD and deployment ownership
+ECS V2 · aplicación privada y datos|ECS V2 · private application and data
+ECS V2 · backups y recuperación SQL supervisada|ECS V2 · SQL backups and supervised recovery
+ECS V2 · dos AZ, NAT ASG y recuperación E13|ECS V2 · two AZs and NAT instance recovery
+ECS V2 · identidades y límites de confianza|ECS V2 · identities and trust boundaries
+ECS elegible · sin IP pública|Eligible for ECS · no public IP
+EIP propia de cada NAT|Dedicated EIP per NAT
+ENI activa|Active ENI
+ENI privadas A / B|Private ENIs A / B
+Egreso A|Egress A
+Egreso B|Egress B
+El CD elige el color activo|CD selects the active color
+El CD espera su resultado|CD waits for the CI result
+Entrada segura|Secure ingress
+Fence positivo|Verified fencing
+Fijar versión|Pin version
+Filas / hash / migraciones|Rows / hash / migrations
+Fronteras y permisos|Boundaries and permissions
+HTTP :8080 · SG restringidos|HTTP :8080 · restricted SGs
+HTTP privado|Private HTTP
+HTTPS · API sin autenticación|HTTPS · unauthenticated API
+Horario · versiones · SSE-KMS|Hourly · versions · SSE-KMS
+IMPLEMENTADO|IMPLEMENTED
+Identidad de lanzamiento y servicios AWS|Startup identity and AWS services
+Identidad separada del runtime|Separate runtime identity
+Inicio RTO|RTO start
+Inyección de versión exacta|Pinned secret version
+Inyección inicial|Startup injection
+Inyectar|Inject
+KMS de aplicación|Application KMS
+Leer versión|Read version
+Listener + regla candidata|Listener + candidate rule
+Login app · migrador OFF|App login · migrator OFF
+Login backup / verificador propios|Dedicated backup / verifier logins
+LÍMITE DEV|DEV LIMIT
+LÍMITE|LIMIT
+Límites de confianza|Trust boundaries
+NAT A · pública A|NAT A · public A
+NAT B · pública B|NAT B · public B
+Ownership y autoridad|Ownership and authority
+POST / GET / KMS · timer activo|POST / GET / KMS · timer active
+PR protegida · CI obligatoria|Protected PR · required CI
+Permiso KMS de texto|Text KMS permission
+Privada A · 10.0.100.0/24|Private A · 10.0.100.0/24
+Privada B · 10.0.101.0/24|Private B · 10.0.101.0/24
+Productor backup SQL|SQL backup producer
+Push imagen|Push image
+Recuperación independiente|Independent recovery
+Red y elegibilidad|Network and placement
+Repara A|Repairs A
+Repara B|Repairs B
+Repara EIP / ruta / SDC|Repairs EIP / route / SDC
+Resultados medidos · 6 noviembre 2026|Measured results · November 6, 2026
+Rol EC2|EC2 role
+Ruta privada A|Private route A
+Ruta privada B|Private route B
+S3 backups · CMK propia|S3 backups · dedicated CMK
+S3 versionado + índice GitHub|Versioned S3 + GitHub index
+SAME-AZ o CROSS-AZ|SAME-AZ or CROSS-AZ
+SO / credenciales|OS / credentials
+SQL en B · ECS elegible|SQL in B · eligible for ECS
+SQL · login runtime|SQL · runtime login
+SSM · acceso backup acotado|SSM · scoped backup access
+Salida regional HTTPS|Regional HTTPS egress
+Salud cliente|Client health
+Salud y recuperación|Health and recovery
+Secreto versionado · TLS estricto|Versioned secret · strict TLS
+Sin IP pública · validated-v2|No public IP · validated-v2
+Terminación HTTPS|HTTPS termination
+URI inmutable @sha256|Immutable @sha256 URI
+Un escritor privado · AZ B|One private writer · AZ B
+Un escritor · copias horarias|One writer · hourly backups
+Una imagen Linux de la API|One Linux API image
+VPC Link → ALB interno|VPC Link → Internal ALB
+Validar|Validate
+Versionado · SSE-KMS|Versioned · SSE-KMS
+Versión exacta · execution role|Pinned version · execution role
+validated-v2 · sin tráfico público|validated-v2 · no public traffic
+Componente de arquitectura|Architecture component
+ASG/E13 es autónomo; no depende de Sentinel. No se demuestra failover automático de una AZ a la otra.|NAT instance recovery operates independently of Sentinel. Automatic failover between AZs was not demonstrated.
+Ambos servicios ECS reciben las subnets privadas A y B: su colocación no queda fijada a un color ni a una AZ. SQL es un único escritor en B.|Both ECS services can use private subnets A and B. Placement is not tied to a color or AZ. SQL has a single writer in B.
+Antes de promover: la cohorte exacta pasa /ready con SQL/KMS. Tras promover: se prueba /ready por la ruta real API Gateway → ALB.|Before promotion, the exact cohort passes /ready with SQL/KMS. After promotion, /ready is checked through API Gateway → ALB.
+Cada subnet pública tiene ruta al IGW. Cada ruta privada apunta a la ENI de su propia NAT; la EIP pertenece al egreso de esa NAT.|Each public subnet routes to the Internet Gateway. Each private route points to its own NAT ENI, whose EIP handles egress.
+Cambios solo documentales: scope omite build/publicación/despliegue. PROD implementado, deshabilitado, no instalado ni validado.|Documentation-only changes skip build, publication, and deployment. PROD is implemented and disabled, and was never installed or validated.
+CloudFront DEMO es independiente del runtime; Sentinel solo permanece en Historia. PROD no está instalado ni validado.|The CloudFront DEMO runs independently of the runtime. Sentinel survives only in the historical record. PROD was never installed or validated.
+DEV al 10 nov 2026. Una tarea activa y un SQL Express: no hay alta disponibilidad de base de datos.|DEV on November 10, 2026 had one active task and one SQL Express instance. The database was not highly available.
+Dos NAT no implican SQL multizona ni múltiples tareas activas. DEV demostrado; PROD no instalado.|Two NAT instances do not imply multi-AZ SQL or multiple active tasks. DEV was demonstrated. PROD was never installed.
+E13 repara EIP, ruta y source/destination checking (SDC desactivado) al reemplazar la instancia de cada ASG.|When an Auto Scaling group replaces a NAT instance, the recovery handlers restore its Elastic IP and route and disable source/destination checking (SDC).
+El administrador del host conserva autoridad sobre SO y SQL; no se presenta ese acceso como aislamiento de un administrador comprometido. PROD no está instalado ni validado.|The host administrator retains authority over the OS and SQL. This does not provide isolation from a compromised administrator. PROD was never installed or validated.
+El ensayo histórico restauró HTTPS en 2m29,191s. Es una medición puntual, no un SLA.|The dated trial restored HTTPS in 2m 29.191s. This is a point-in-time measurement, not an SLA.
+El execution role inyecta el secreto al arrancar. Solo el task role de la API utiliza la CMK de texto.|The execution role injects the secret at startup. Only the API task role uses the text encryption key.
+El execution role lee la versión aprobada del secreto y la inyecta al inicio; no es el task role que utiliza KMS durante las peticiones.|The execution role reads the approved secret version and injects it at startup. The separate task role uses KMS during requests.
+El listener dirige al color seleccionado por el CD; blue y green son destinos intercambiables, no estados permanentes.|The listener routes to the color selected by CD. Blue and green are interchangeable targets, with no permanent assignment.
+El productor nativo SQL realiza COPY_ONLY + CHECKSUM, verifica y publica backup/manifiesto en S3 con SSE-KMS.|The native SQL producer runs COPY_ONLY + CHECKSUM, verifies the backup, and publishes the backup and manifest to S3 with SSE-KMS.
+GitHub Actions usa OIDC y api-dev limitado a develop para delivery; ese rol no es runtime ni administrador. El detalle de ownership está en CD DEV.|GitHub Actions uses OIDC with api-dev scoped to develop for delivery. That role is separate from runtime and administrator identities. See DEV CD for ownership details.
+HTTPS público termina en API Gateway. Los SG restringen Link → ALB → API → SQL; los saltos HTTP privados no ofrecen cifrado extremo a extremo.|Public HTTPS terminates at API Gateway. Security groups restrict Link → ALB → API → SQL. Private HTTP hops do not provide end-to-end encryption.
+HTTPS termina en API Gateway; Link/ALB/API usan HTTP privado. SQL valida hostname y cadena de la CA DEV definitiva.|HTTPS terminates at API Gateway. Link, ALB, and API use private HTTP. SQL validates the hostname and the final DEV CA chain.
+La API DEV no autentica al visitante y devuelve texto descifrado: usar datos sintéticos. KMS no reemplaza autorización de aplicación.|The DEV API returns plaintext and does not authenticate visitors. Use synthetic data. KMS does not provide application authorization.
+No habilitar otro escritor hasta acreditar el fence del origen. Restaurar en la nueva EC2 y comprobar CHECKDB, contenido y permisos antes de reconectar la API.|Verify source fencing before enabling another writer. Restore on the new EC2 instance and verify CHECKDB, contents, and permissions before reconnecting the API.
+No hay alta disponibilidad SQL ni PITR. La copia final planificada no demuestra RPO cero ante pérdida abrupta.|There is no SQL high availability or PITR. A planned final backup does not demonstrate zero RPO during sudden loss.
+Operación normal: backup COPY_ONLY horario con CHECKSUM y RESTORE VERIFYONLY, luego publicación cifrada y versionada de la pareja backup/manifiesto.|Normal operation runs an hourly COPY_ONLY backup with CHECKSUM and RESTORE VERIFYONLY, then publishes a versioned, encrypted backup and manifest.
+PR sin autoridad AWS. El workflow integrado usa OIDC y api-dev restringido a develop; exclusión GitHub por ambiente y handover administrativo de escritores externos.|Pull requests have no AWS authority. The merged workflow uses OIDC and api-dev restricted to develop. GitHub serializes writes by environment, with administrative handover for external writers.
+Recuperación planificada: drenar escrituras, aislar el origen y verificar una copia final. Proteger la entrada fuera del Lifecycle antes de sustituir la instancia.|Planned recovery drains writes, isolates the source, and verifies a final backup. Protect the restore input from the lifecycle policy before replacing the instance.
+Release y estado versionados en S3; índice de releases en GitHub. DEV demostrado en runs 42751096835 y 42761946295; los artifacts son diagnóstico.|S3 versions the release and state. GitHub stores the release index. Runs 42751096835 and 42761946295 demonstrated DEV. Artifacts are for diagnostics.
+Retención: siete días solo en versiones admitidas, con dos parejas recientes protegidas y restore holds. Un disco antiguo no se reactiva tras nuevas escrituras sin reconciliación.|Retention is seven days for accepted versions, with the two latest pairs protected and restore holds in place. Reconcile an old disk before reactivation after new writes.
+Runtime SQL y migrador tienen credenciales separadas. El migrador no se ejecuta al arrancar HTTP. Backup/verificador usan identidades propias y permisos restringidos.|SQL runtime and migrations have separate credentials. The migrator does not run at HTTP startup. Backup and verifier processes have dedicated, restricted identities.
+SAME-AZ: 24m42,6s. CROSS-AZ: 41m31,5s. Incluyen nueva EC2, restore y validación API/KMS; ensayos supervisados, no garantías de servicio.|SAME-AZ: 24m 42.6s. CROSS-AZ: 41m 31.5s. Both include a new EC2 instance, restore, and API/KMS validation. These were supervised trials, not service guarantees.
+SQL valida su identidad con la CA DEV definitiva y sql.demo.internal: validated-v2, Encrypt=True, TrustServerCertificate=False. La raíz pública llega por configuración, no dentro de la imagen.|SQL identity is validated with the final DEV CA and sql.demo.internal: validated-v2, Encrypt=True, TrustServerCertificate=False. Configuration supplies the public root certificate outside the image.
+Se espera, se releen ambas rutas y la cohorte y se repite la salud de cliente antes de drenar el color anterior.|Before draining the previous color, wait, recheck both routes and the cohort, then repeat the client health check.
+Si falla antes del drenaje, se restaura tráfico al color previo sano. Después, rollback explícito con imagen compatible y configuración TLS vigente.|If the check fails before drain, restore traffic to the previous healthy color. After drain, perform an explicit rollback with a compatible image and current TLS configuration.
+Terraform/Terragrunt conserva los skeletons, red y recursos; ignora task_definition, desired_count y las acciones de forwarding gestionadas por delivery.|Terraform/Terragrunt owns skeletons, networking, and resources. It ignores task_definition, desired_count, and forwarding actions owned by delivery.
+Un diagrama de arquitectura generado por Archify.|An architecture diagram generated by Archify.
+En móvil: deslice el diagrama a tamaño legible. Todos los componentes, relaciones y fuentes también están disponibles como texto debajo; “Vista completa” prioriza orientación, no lectura del detalle.|On mobile, pan the diagram at its readable size. All components, relationships, and sources are also listed as text below. Use Full view for orientation.
+Fuente: 33a32d44351810ab9a815af1da2d1f32d4b968ad. Esta hoja no ejecuta solicitudes AWS, no carga recursos externos y no modifica el SVG original.|Source revision: 33a32d44351810ab9a815af1da2d1f32d4b968ad. This presentation loads no AWS or external resources. The source SVG is preserved.
+Hoja de lectura del repositorio. SVG íntegro generado por Archify; presentación y relaciones textuales generadas por|Repository reading sheet based on the original Archify SVG. Layout and text relationships generated by
+Componentes, relaciones y fuentes|Components, relationships, and sources
+Fuente JSON|JSON source
+Fuentes en el commit revisado|Sources at the reviewed commit
+Tamaño legible|Readable size
+Vista completa|Full view
+Índice y límites|Index and limitations
+Diagrama desplazable; relaciones completas en texto a continuación|Diagram can be panned. Full relationships are listed in text below.
+Escala del diagrama|Diagram scale
+Ampliar 150%|Zoom to 150%
+Ajustar todo|Fit all
+Ajustar ancho|Fit width
+Ajustar ancho del diagrama|Fit diagram width
+Ajustar ancho (W) · vertical content may need pan/zoom|Fit width (W) · vertical content may need pan/zoom
+Amplía el diagrama y desplázalo. Ajustar todo restaura la vista.|Zoom in and pan the diagram. Fit all restores the overview.
+Diagrama|Diagram
+Leyenda|Legend
+Base de datos|Database
+Externo|External
+Nube|Cloud
+Seguridad|Security
+Abrir Archify oficial interactivo|Open the interactive Archify diagram
+Alcance, evidencia y limitaciones|Scope, evidence, and limitations
+. No es un nuevo visor del portafolio ni una comprobación de salud en tiempo real.|. The reading sheet does not report live health.
+ECS V2 / AWS DEV / SNAPSHOT 10 NOV 2026|ECS V2 / AWS DEV / SNAPSHOT NOV 10, 2026
+ARCHIFY / LÁMINA 04|ARCHIFY / PLATE 04
+FLUJO DE SEÑAL|SIGNAL FLOW

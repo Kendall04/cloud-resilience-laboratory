@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "snapshot": "2026-11-10",
+  "scope": "Final visual review of five current ECS views; 12 historical originals unchanged",
+  "tool": {
+    "official_repository": "https://github.com/tt-a1i/archify",
+    "tag": "v3.1.0",
+    "commit": "1c2b42d660e4a7571813fb43839c79e3e9ca7720",
+    "artifact_url": "https://raw.githubusercontent.com/tt-a1i/archify/1c2b42d660e4a7571813fb43839c79e3e9ca7720/archify.zip",
+    "zip_sha256": "ffedc53390c9da6e859f41e432c5d2d0615a23cf00a503181f07efbba88a7ce8",
+    "bytes": 5017500,
+    "global_install": false,
+    "dependencies_installed": false,
+    "source": "Official pinned ZIP authenticated against the existing docs/interactive/GENERATION.json provenance; isolated local execution."
+  },
+  "nodeVersion": "24.22.1",
+  "sourceRevision": "33a32d44351810ab9a815af1da2d1f32d4b968ad",
+  "command": "node <authenticated-archify>/bin/archify.mjs finalize architecture docs/interactive/source/<id>.json docs/interactive/<id>.html --repo-root . --quality showcase --out-dir <new-evidence> --json",
+  "diagrams": [
+    {
+      "id": "ecs-platform",
+      "source": "source/ecs-platform.json",
+      "output": "ecs-platform.html",
+      "sourceSha256": "28ad5723127fb241d7e7bb77a2062668c74ed1b876a4a44ab426e7ac09e56832",
+      "htmlSha256": "3cb01c8ab4590a49a76d33c1ee596a91bf4b5ccb8ec5e61f8741df58910fc265",
+      "readingSha256": "6079ab74b47e33f39dd98cb456251113013ef38d4bd531e3ee0c8ffa392d73bc",
+      "gates": {
+        "validate": "pass",
+        "deliver": "pass",
+        "check": "pass",
+        "browser-check": "pass"
+      }
+    },
+    {
+      "id": "ecs-network",
+      "source": "source/ecs-network.json",
+      "output": "ecs-network.html",
+      "sourceSha256": "09eca01392aa04366195faf09196b930d373bb3c905fd6a2c916c10023a3dbba",
+      "htmlSha256": "b5766ed360cbada8042462255c2cb8ca0c97dfbd8d5df6a123e981a8446fe73e",
+      "readingSha256": "1a9fe0e6ed48a0ebcfb91625087c277087957a667226fae75bd97758b5fbbeeb",
+      "gates": {
+        "validate": "pass",
+        "deliver": "pass",
+        "check": "pass",
+        "browser-check": "pass"
+      }
+    },
+    {
+      "id": "ecs-sql-recovery",
+      "source": "source/ecs-sql-recovery.json",
+      "output": "ecs-sql-recovery.html",
+      "sourceSha256": "aeb05a72562b5ae53fc63a958bc9b87bc7cf7719168af180838d5aff2b437fec",
+      "htmlSha256": "d6100177aad5dab77bc5244ad418a5e7b10c59f84f65c879b2459415cdc99599",
+      "readingSha256": "f90dea73fc11db7a346b2b6d1929bf6f019f27265fd9449fc6347ae8ba75643a",
+      "gates": {
+        "validate": "pass",
+        "deliver": "pass",
+        "check": "pass",
+        "browser-check": "pass"
+      }
+    },
+    {
+      "id": "ecs-trust",
+      "source": "source/ecs-trust.json",
+      "output": "ecs-trust.html",
+      "sourceSha256": "cdc3667666c77599ee8ed11999ee5b2ac3addc2a601863e41aa0bc829df687a0",
+      "htmlSha256": "a7c3e65d5ed1452aa73df316d698980f3131f5bc0df45d15257210fa7ac18a17",
+      "readingSha256": "d201b94083e4849e31b9ad504bb2338e27d4faba46a8a32eb7a274a8a58f3804",
+      "gates": {
+        "validate": "pass",
+        "deliver": "pass",
+        "check": "pass",
+        "browser-check": "pass"
+      }
+    },
+    {
+      "id": "ecs-delivery",
+      "source": "source/ecs-delivery.json",
+      "output": "ecs-delivery.html",
+      "sourceSha256": "ab13264262b753bc36a06a8702e5bc2b70dfbaf575a90360376c66c632c84eb7",
+      "htmlSha256": "1b47f94226cba65bc3108cbc371cc77d870fdbbd5b0fe9993b2d6b1d708f40f7",
+      "readingSha256": "b6abec910b99210c1f3b109ca9b4f032084b4451597f139c80d0e3e827e42eee",
+      "gates": {
+        "validate": "pass",
+        "deliver": "pass",
+        "check": "pass",
+        "browser-check": "pass"
+      }
+    }
+  ],
+  "acceptedHistoryUnchanged": [
+    "GENERATION.json",
+    "GENERATION-V2.json",
+    "TRACEABILITY-V2.json",
+    "../portfolio/archify-pins.json"
+  ]
+}
