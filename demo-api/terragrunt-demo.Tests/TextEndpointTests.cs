@@ -60,7 +60,7 @@ public class TextEndpointTests
         using var client = factory.CreateClient();
         var response = await client.PostAsJsonAsync("/text", new { Text = new string(' ', length) });
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        Assert.Equal("Text cannot be empty.1234", await response.Content.ReadAsStringAsync());
+        Assert.Equal("Text cannot be empty.", await response.Content.ReadAsStringAsync());
         Assert.Equal(0, factory.Kms.EncryptCalls);
         Assert.Empty(factory.Repository.Items);
     }

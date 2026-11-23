@@ -44,11 +44,14 @@ test("memory demo supports text/XSS literals, pagination and reset without fetch
   };
   try {
     const api = createDemo();
+    assert.equal(api.total, 2);
     assert.equal((await api.list()).length, 2);
     const row = await api.create("<img src=x onerror=alert(1)>");
+    assert.equal(api.total, 3);
     assert.equal((await api.list(1, 1))[0].text, row.text);
     assert.equal((await api.list(2, 1))[0].id, 2);
     api.reset();
+    assert.equal(api.total, 2);
     assert.equal((await api.list()).length, 2);
     assert.equal((await api.health()).live, "Simulated");
   } finally {

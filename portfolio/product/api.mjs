@@ -52,6 +52,9 @@ export function createDemo() {
   reset();
   return {
     mode: "demo",
+    get total() {
+      return rows.length;
+    },
     async health() {
       return { live: "Simulated", ready: "No AWS dependencies" };
     },

@@ -128,6 +128,33 @@ try {
   await p.locator("#reset").click();
   assert.equal(await p.locator(".message-row").count(), 2);
   pass("DEMO create/read/reset and literal XSS");
+  const previous = p.getByRole("button", { name: "← Previous", exact: true });
+  const next = p.getByRole("button", { name: "Next →", exact: true });
+  const pageLabel = p.locator("#page-label");
+  assert(await previous.isDisabled());
+  assert(await next.isDisabled());
+  for (let i = 0; i < 4; i++) {
+    await p.locator("#message").fill("Synthetic page boundary " + i);
+    await p.locator("#send").click();
+    await p.locator(".message-row").first().filter({ hasText: "Synthetic page boundary " + i }).waitFor();
+  }
+  assert.equal(await pageLabel.textContent(), "Page 1 of 2");
+  assert(await previous.isDisabled());
+  await next.click();
+  await p.locator('.message-row[data-id="1"]').waitFor();
+  assert.equal(await pageLabel.textContent(), "Page 2 of 2");
+  assert.equal(await p.locator(".message-row").count(), 1);
+  assert(await next.isDisabled());
+  await p.locator("#refresh").click();
+  assert.equal(await pageLabel.textContent(), "Page 2 of 2");
+  await previous.click();
+  assert.equal(await pageLabel.textContent(), "Page 1 of 2");
+  await next.click();
+  await p.locator("#reset").click();
+  assert.equal(await pageLabel.textContent(), "Page 1 of 1");
+  assert(await previous.isDisabled());
+  assert(await next.isDisabled());
+  pass("DEMO paging tracks available records across create, refresh and reset");
   await capture(p, "desktop-product");
   assert.equal(await p.locator("#space-nav a").count(), 2);
   assert.equal((await p.locator("#workspace-context").innerText()).trim().replace(/\s+/g, " "), "Workspace / Messages");
@@ -223,6 +250,14 @@ try {
         await assertEnglish(reader);
         assert(await reader.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
         assert.equal(await reader.locator("a[href]").count(), 0);
+        const references = reader.locator("a[aria-disabled=true]");
+        assert((await references.count()) > 0);
+        assert(await references.evaluateAll(nodes => nodes.every(node => {
+          const style = getComputedStyle(node);
+          node.focus();
+          return style.textDecorationLine === "none" && style.cursor === "auto" &&
+            node.ownerDocument.activeElement !== node;
+        })));
         await reader.locator("article").first().scrollIntoViewIfNeeded();
         await capture(p, "mobile-reading-" + d.id);
         await p.getByRole("button", {name: "Back to diagram", exact: true}).click();

@@ -84,6 +84,9 @@ export async function diagramAsset(route) {
       sheet = sheet.replace(
         /(<a\b[^>]*?)\s+href="[^"]*"/g,
         '$1 aria-disabled="true"',
+      ).replace(
+        "</style>",
+        'a[aria-disabled="true"]{color:inherit;text-decoration:none;cursor:auto}</style>',
       );
       asset = { body: englishPresentation(sheet), type: "text/html", policy: diagramPolicy };
     } else {

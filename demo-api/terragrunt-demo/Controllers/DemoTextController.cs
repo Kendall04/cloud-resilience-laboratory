@@ -31,7 +31,7 @@ namespace terragrunt_demo.Controllers
             CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(request.Text))
-                return BadRequest("Text cannot be empty.1234");
+                return BadRequest("Text cannot be empty.");
 
             var command = new InsertTextCommand(request.Text);
             try

@@ -262,12 +262,30 @@ function product() {
   const list = el("div", { id: "messages", class: "message-list" }),
     listStatus = el("div", { id: "list-status" }),
     pageLabel = el("span", { id: "page-label" }, "Page 1");
+  const pageSize = 5;
+  let lastPage = 20;
+  const previous = button("← Previous", () => {
+    if (pageNumber > 1) {
+      pageNumber--;
+      load();
+    }
+  }, "quiet", { disabled: edition === "demo" });
+  const next = button("Next →", () => {
+    if (pageNumber < lastPage) {
+      pageNumber++;
+      load();
+    }
+  }, "quiet", { disabled: edition === "demo" });
   async function load() {
     const loadButton = $("#refresh");
     if (loadButton) loadButton.disabled = true;
     listStatus.textContent = "Loading messages…";
     try {
-      const rows = await api.list(pageNumber, 5);
+      if (edition === "demo") {
+        lastPage = Math.max(1, Math.ceil(api.total / pageSize));
+        pageNumber = Math.min(pageNumber, lastPage);
+      }
+      const rows = await api.list(pageNumber, pageSize);
       list.replaceChildren();
       if (!rows.length)
         list.append(
@@ -297,6 +315,11 @@ function product() {
         );
       }
       pageLabel.textContent = "Page " + pageNumber;
+      if (edition === "demo") {
+        pageLabel.textContent += " of " + lastPage;
+        previous.disabled = pageNumber === 1;
+        next.disabled = pageNumber === lastPage;
+      }
       listStatus.textContent =
         edition === "demo"
           ? "Synthetic data in memory."
@@ -368,27 +391,9 @@ function product() {
           el(
             "div",
             { class: "pagination" },
-            button(
-              "← Previous",
-              () => {
-                if (pageNumber > 1) {
-                  pageNumber--;
-                  load();
-                }
-              },
-              "quiet",
-            ),
+            previous,
             pageLabel,
-            button(
-              "Next →",
-              () => {
-                if (pageNumber < 20) {
-                  pageNumber++;
-                  load();
-                }
-              },
-              "quiet",
-            ),
+            next,
           ),
         ),
       ),
